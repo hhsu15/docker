@@ -59,7 +59,7 @@ docker run redis
 ```
 - now you started redis server, let's try redis cli. Notice, this is effectively starting another program within the container. The command you need is:
 ```
-docker exec -it <container id> <command>  # -it allows you to provide input to the container
+docker exec -it <container id> <command>  # -it allows you to provide input to the running container
 ```
 - so the actual command will be like this:
 ```
@@ -70,7 +70,7 @@ now you can use redis!!
 ### Go into the container and operate on linux
 - this will allow you to operate the linux in the container
 ```
-docker exec -it <container id> sh
+docker exec -it <container id> sh  # notice it has to be id. It won't work for a image tag
 ```
 - sh is a commen shell, like bash, which allows you to execute commands.
 - run control + d to get out of the container. Or you can type exit
@@ -96,6 +96,7 @@ docker run <id>  # will start the container
 - convention for you tag
 ```
 docker build -t <dockerid>/<imagename>:<version> .
+docker run <dockerid>/<imagename>
 ```
 #### you can also mannally create your custom iamge based off of yyour existing container
 - though you probally rarely have to do this, it is possible
@@ -104,3 +105,33 @@ docker build -t <dockerid>/<imagename>:<version> .
 docker commit -c 'CMD["redis-server"]' <container id>
 ```
 - this will generate another hash id for the image. You can then docker run <new id> to start this container
+
+
+## Create a small web and run on docker
+- To find the base image you need, go on ```hub.docker.com```
+- for the example of ```simpleweb```, we use the ```node``` image
+- refer to ```simpleweb``` Dockerfile to see how image is created
+- run below to build an image and start your container
+```
+docker build -t hhsu15/smallweb .
+# to be able to direct the port from the container to your local machine. Below we are saying redirect the request to local 5000 to 8080 in the container
+docker run -p 5000:8080 hhsu15/smallweb 
+```
+
+## Create a webserver to track traffic
+In this execise, we will create two containers, one for node.js webserver and another one using redis (redis is like an in memory database)
+- see ```visits``` for example code but basically two things here:
+  - create an image for your node js program which uses redis, run this in container
+  - create another container for redis. This is simply ```docker run redis```
+  - now the gotcha here is these two containers don't talk to each other so you need to create the network. To do so, we will use ```docker compose```
+### docker compose
+Basically a wrapper of docker cli to make the commands easier to do more complex things
+- this is going to be done via a ```docker-compose.yml```. Refer to the file
+- by specifing the services in the yml file, docker will create a network for those services 
+- and those services can be refered by the name (e.g., redis-sever) as the host
+- the commands to run docker-compose.yml file will be:
+```
+docker-compose up  # to start the docker compose
+docker-compose up --build  # if you make changes to the code you will need to run this to rebuild
+```
+

@@ -1,0 +1,8 @@
+version: '3'
+services:  # by using docker-compose, it automatically creates a network for the services 
+  redis-server:  # service called redis-server
+    image: 'redis'  # use the redis image
+  node-app:  # service called node-app
+    build: .  # build in current directory (by taking the Dockerfile)
+    ports:
+      - "4001:8081"  # "-" in yml file specifies an array so you can technically specify multiple ports
