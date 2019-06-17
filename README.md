@@ -127,11 +127,31 @@ In this execise, we will create two containers, one for node.js webserver and an
 ### docker compose
 Basically a wrapper of docker cli to make the commands easier to do more complex things
 - this is going to be done via a ```docker-compose.yml```. Refer to the file
-- by specifing the services in the yml file, docker will create a network for those services 
+- by specifying the services in the yml file, docker will create a network for those services 
 - and those services can be refered by the name (e.g., redis-sever) as the host
 - the commands to run docker-compose.yml file will be:
 ```
 docker-compose up  # to start the docker compose
 docker-compose up --build  # if you make changes to the code you will need to run this to rebuild
 ```
+- more on docker compose
+```
+# run docker-compose in the background
+docker-compose up -d
 
+# stop containers
+docker-compose down
+```
+- Notice that in the docker-compose.yml, you can use the `restart` key to specify in what situation you want to restart your server.
+- same as `docker ps`, you can use
+```
+docker-compose ps
+
+```
+
+## Create a production grade workflow
+- In the example we use react to create an app, put a `Dockerfile.dev` for development build. 
+```
+docker build -t hhsu15/frontend -f Dockerfile.dev .
+docker run -p 3000:3000 hhsu15/frontend
+```
