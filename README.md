@@ -155,3 +155,10 @@ docker-compose ps
 docker build -t hhsu15/frontend -f Dockerfile.dev .
 docker run -p 3000:3000 hhsu15/frontend
 ```
+## Use docker volumn to create reference outside of container
+You can create a reference for files outside of a container when running a container.
+- the syntax looks like this:
+```
+docker run -p 3000:3000 -v /app/node_modules -v $(pwd):/app ce17d837210e
+```
+The second volumn switch (-v) says map everything in current local directory to /app in the container, while the first volumn switch says use the /app/node_modules in the containerrather than mapping it to anything - since we deleted the node_modules in our local because it was already built in the container 
