@@ -1,4 +1,4 @@
-# docke/
+# docker
 ## Set up docker
 - go to **docker.com** and download docker
 - verify installation
