@@ -171,7 +171,20 @@ docker run -it hhsu15/frontend npm run test # provide the override command (use 
 ```
 - now, in order for the container to be able to realtime detect the changes without us rebuilding the image, there are two options:
   - go into the running container built via docker-compose and run the command, this way, the files are all being referenced to your local files
-  ```
+```
   docker exec -it <container id> npm run test
-  ```
+```
   - use docker-compose. Basically create two services/containers, one for the webserver and one for the test. refer to docker-compose.yml
+
+```
+## Move to prod
+We will use nignx for example of multi step build process- essentially build two images, one for **Build Phase** and one for **Run Phase**. The first phase to generate the build contents ready for pproduction and the second phase is to copy the `build` folder and place it in nignx
+- Multi step build process. Refer to Dockerfile
+- then build and start the container
+```
+docker build . # by default, use Dockerfile
+docker run -p 8080:80 <id> # map nginx default port 80 to local 8080
+```
+- Great! nginx is 100% production appropriate!
+
+
