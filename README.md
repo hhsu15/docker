@@ -1,4 +1,4 @@
-# docker
+# docke/
 ## Set up docker
 - go to **docker.com** and download docker
 - verify installation
@@ -57,7 +57,7 @@ docker kill {id} # force docker to stop
 ```
 docker run redis
 ```
-- now you started redis server, let's try redis cli. Notice, this is effectively starting another program within the container. The command you need is:
+- now you started redis server, let's try redis cli. Notice, this is effectively starting another program within the running container. The command you need is:
 ```
 docker exec -it <container id> <command>  # -it allows you to provide input to the running container
 ```
@@ -150,15 +150,28 @@ docker-compose ps
 ```
 
 ## Create a production grade workflow
-- In the example we use react to create an app, put a `Dockerfile.dev` for development build. 
+- In the example we use react to create an app, put
+a `Dockerfile.dev` for development build. 
 ```
 docker build -t hhsu15/frontend -f Dockerfile.dev .
 docker run -p 3000:3000 hhsu15/frontend
 ```
-## Use docker volumn to create reference outside of container
-You can create a reference for files outside of a container when running a container.
+## Use docker volumes to create reference outside of container
+You can create a reference for files outside of a container when running a container. This is helpful when you want to reflect the changes in the code (say if you use react) to the container without having to rebuild.
 - the syntax looks like this:
 ```
 docker run -p 3000:3000 -v /app/node_modules -v $(pwd):/app ce17d837210e
 ```
-The second volumn switch (-v) says map everything in current local directory to /app in the container, while the first volumn switch says use the /app/node_modules in the containerrather than mapping it to anything - since we deleted the node_modules in our local because it was already built in the container 
+The second volume switch (-v) says map everything in current local directory to /app in the container, while the first volumn switch says use the /app/node_modules in the containerrather than mapping it to anything - since we deleted the node_modules in our local because it was already built in the container 
+- this can also be achieved by using docker-compose (preferred). Refer to `docker-compose.yml` in `frontend` 
+- To run test in the container, essentially you are starting the container and overriding the commend here:
+```
+docker build -t hhsu15/frontend -f Dockerfile.dev .
+docker run -it hhsu15/frontend npm run test # provide the override command (use -it so you can see the I/O inside of the container)
+```
+- now, in order for the container to be able to realtime detect the changes without us rebuilding the image, there are two options:
+  - go into the running container built via docker-compose and run the command, this way, the files are all being referenced to your local files
+  ```
+  docker exec -it <container id> npm run test
+  ```
+  - use docker-compose. Basically create two services/containers, one for the webserver and one for the test. refer to docker-compose.yml
