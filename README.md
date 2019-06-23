@@ -188,3 +188,29 @@ docker run -p 8080:80 <id> # map nginx default port 80 to local 8080
 - Great! nginx is 100% production appropriate!
 
 
+## Onto Travis
+- go to travis site and activate your repo!
+- get the unittest run on Travis
+- refer to .travis.yml
+- Note! there is a problem with npm run test. After running all the tests it goes into watch mode and it just hangs. The was fixed by setting the value to "test": "CI=true react-scripts test" in packages.json
+
+## Deploy to AWS!
+We are going to use Elastic Beanstalk
+- Log into AWS and search for Elastic Beanstalk. Follow the steps to:
+- create new application -> create environment -> web server environment -> base configuration -> platform -> Docker -> create environment
+  - Elastic Beanstalk uses a loadbalancer and creates virtual machines(instances) as needed. Each virtual machine contains a docker container that has your app.
+- now we will configure travis CI to deploy to AWS
+- refer to the .travis.yml file for deploy
+- note you need to get the API key by going into AWS, use IAM(identification and Access Management)
+  - go into `user` tab
+  - create new user
+  - select programaic access
+  - go to next, and select "Attach existing policies directly"
+  - search for beanstalk and select the one that says "provide full access". This will grant access for travis to deploy service to AWS
+ - now, once you have your API key and secret key, go to the travis site and your service. 
+  - click on "more options"
+  - go to "settings"
+  - find env variables"
+    - set env variables for your API key and Secret Key
+  - now you will be able to use those env variables in your travis file
+- Cool! At the point we should be good to go. Once you push the changes to the master it should be deployed into AWS Elastic Beanstalk
