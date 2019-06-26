@@ -1,3 +1,6 @@
 [submodule "frontend"]
 	path = frontend
 	url = https://github.com/hhsu15/frontend.git
+[submodule "complex_example"]
+	path = complex_example
+	url = https://github.com/hhsu15/complex_example.git
