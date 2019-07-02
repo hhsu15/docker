@@ -178,7 +178,7 @@ docker run -it hhsu15/frontend npm run test # provide the override command (use 
 
 
 ## Move to prod
-We will use nignx for example of multi step build process- essentially build two images, one for **Build Phase** and one for **Run Phase**. The first phase to generate the build contents ready for pproduction and the second phase is to copy the `build` folder and place it in nignx
+We will use nignx for example of multi step build process- essentially build two images, one for **Build Phase** and one for **Run Phase**. The first phase to generate the build contents ready for production and the second phase is to copy the `build` folder and place it in nignx
 - Multi step build process. Refer to Dockerfile
 - then build and start the container
 ```
@@ -214,3 +214,42 @@ We are going to use Elastic Beanstalk
     - set env variables for your API key and Secret Key
   - now you will be able to use those env variables in your travis file
 - Cool! At the point we should be good to go. Once you push the changes to the master it should be deployed into AWS Elastic Beanstalk
+
+## Build Multi-Container Application
+First, we are building an application that's quite complex, the app will have:
+  - A website(react app) that allows user to enter fibonacci index
+  - A server API that takes the index and send to two places
+    - redis 
+	- postgres db
+Refer to the repo ```coplex_example```
+- we will create a Dockerfile.dev (for development) for each one - client, server, worker
+- notice that for server and worker we will use "nodeomn" whcih has the commandline tool to automatically reload your entire project where there is a change to your source code. We will set up the volume (to reference your local files) so nodemon will be able to detect the changes. In react this is already taken care of.
+### Workflow design
+We are going to have a lof of containers! Here we build the images for react app, express server, worker ourselves. Essentially all these 5 commponents are individual containers.
+```
+Input data in web broswer
+--> Nginx 
+   --> React Server
+         |
+         V
+   --> Express Server
+        --> Redis <---> Worker
+        
+        --> Prostgres
+```
+- we will make a docker-compose file to make this happen easily! Refer to the repo.
+- Then, for the Nginx, we will have a config file for the purpose of routing, i.e, 
+  - if coming to '/' send to client upstream
+  - if coming to '/api' send to server upstream
+- create a dockerfile for nginx to hookup the default.conf
+### Travis to build and push to docker hub
+- long story short, we will set up the travis CI to build these images
+- we will use trais to push these images to docker hub repositories 
+- then move on to AWS elastic beanstalk
+
+### Onto AWS
+In order for AWS Elasticbean to run multiple containers, we will create a `Dockerrun.aws.json` file. The purpose is similiar to the `docker-compose.yml` in that we give the instructions what we want to run. Unlike the `docker-compos.yml` though, we don't have to build those images because we already have them available in docker hub.
+- once the Dockerrun.aws.json is done, go to AWS and create a new applicaiton.
+- In the basic configuration -> Preconfigured platform -> select Muti-container Docker and then create environment
+
+
