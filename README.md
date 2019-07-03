@@ -252,4 +252,8 @@ In order for AWS Elasticbean to run multiple containers, we will create a `Docke
 - once the Dockerrun.aws.json is done, go to AWS and create a new applicaiton.
 - In the basic configuration -> Preconfigured platform -> select Muti-container Docker and then create environment
 
-
+### AWS deployment architecture
+Now, for AWS deployment, we will change the architecture (a lot). Essentially, we will have the four services(nginx, client, server and worker) hosted in Elastic Beanstalk as the `dockerrun.aws.json` describes, and, as best practice, we will host host the Redis using `AWS Elastic Cache`- pro grade Redis setting,  and Postgres in `AWS Relational Database Service(RDS)`.
+- by default these services don't talk to each other, so we will have to wire them out first. We have to do the following
+  - VPC(virtual private cloud) is your own network to host your instances. For each available zone, there is a default VPC that's given to you. We will leverage VPC to connect our services.
+  - Security Group (Firewall Rules) for your VPC. We will set up the security group to allow any other AWS services that has this same security group -> for Elastic Beanstalk, Elastic Cache, and RDS.
