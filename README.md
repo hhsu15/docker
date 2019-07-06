@@ -257,3 +257,4 @@ Now, for AWS deployment, we will change the architecture (a lot). Essentially, w
 - by default these services don't talk to each other, so we will have to wire them out first. We have to do the following
   - VPC(virtual private cloud) is your own network to host your instances. For each available zone, there is a default VPC that's given to you. We will leverage VPC to connect our services.
   - Security Group (Firewall Rules) for your VPC. We will set up the security group to allow any other AWS services that has this same security group -> for Elastic Beanstalk, Elastic Cache, and RDS.
+
