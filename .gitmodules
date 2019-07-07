@@ -4,3 +4,6 @@
 [submodule "complex_example"]
 	path = complex_example
 	url = https://github.com/hhsu15/complex_example.git
+[submodule "simplek8s"]
+	path = simplek8s
+	url = https://github.com/hhsu15/simplek8s.git

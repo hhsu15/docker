@@ -261,3 +261,54 @@ Now, for AWS deployment, we will change the architecture (a lot). Essentially, w
   - for REDIS_HOST and POSTGRESHOST, go to EC and RDS and retrieve the primary endpoint. For other postgres variables (such as db name), refer to the memo. 
 - Go to IAM to create new API key and Secret key
 - Update the `.travis.yml` file to include the AWD deployment
+- .....
+
+## Kubernetes
+Finally, Kubernetes. Basically, in order to scale up our application, for example the previous fib example, we might only need to increase the "worker", as opposed to the entire container that has client, server, nginx (which EB offers). Kubernete will allow you to make this happen.
+- Kubernete cluster: a master with multiple nodes(machines). Each node can run many different containers. So imagine we have one node that runs the container that has nginx, client, server, and many other nodes that run worker image
+### Installation
+- install kubectl
+```
+brew install kubectl
+which kubectl
+```
+- then make sure you have virtualbox
+- install minikube
+```
+brew cask install minikube
+```
+- then run
+```
+minikube start # will start the virtualbox. This creates a virtual machine to run your "Node"
+minikube status # to make sure everything is set up and correctly configured
+kubectl cluster-info # make sure it's working
+```
+### Configuration
+- To use Kubernete, we basically need two configuration files:
+  - config file describing the containers we want. In Kubernete's world, we are not making a container. We are making an "object". The config files will produce the objects. There are several kinds of objects: Pod, Service, StatefulSet, ReplicaController. Pod is used to run a container. Service is to set up networking etc.
+#### Pod
+- Runs one or more closely related containers
+- In the world of Kubernetes, there is no such thing as running one single container. The smallest thing you can create is is a "Pod" which has container(s). A Pod hosts a group of containers which serve similar purpose.
+#### Service
+- Sets up networking in a Kubernetes Cluster
+  - ClusterIP
+  - NodePort: Expose a container to the outside world (only for dev purpose)
+  - LoadBalancer
+  - Ingress
+
+#### Feed the config into Kubenetes cluster
+```bash
+# kubectl apply -f <filepath>
+kubectl apply -f client-pod.yaml
+kubectl apply -f client-node-port.yaml
+
+# to check if it's running, do
+kubectl get pods
+```
+- to visit the ports inside the vm k8 cluster that minikube created, 
+```
+# get the ports
+minikube ip # will get something like 192.168.99.100
+```
+  - then paste this into your broswer such that:
+    - 192.168.99.100:31515
