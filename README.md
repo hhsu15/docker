@@ -254,14 +254,29 @@ In order for AWS Elasticbean to run multiple containers, we will create a `Docke
 
 ### AWS deployment architecture
 Now, for AWS deployment, we will change the architecture (a lot). Essentially, we will have the four services(nginx, client, server and worker) hosted in Elastic Beanstalk as the `dockerrun.aws.json` describes, and, as best practice, we will host host the Redis using `AWS Elastic Cache`- pro grade Redis setting,  and Postgres in `AWS Relational Database Service(RDS)`.
+- go ahead and create a app for:
+  - EB
+    - make sure you select multi docker containers
+  - EC
+    - selct Redis
+	  - for the node type, make sure to select cache.t2.micro (cheapest)
+	  - make replica 0
+
+  - RDS for postgres
+    - select postgres
+	- in Settings:
+	  - make sure you record the username, password and db name which you will use in Travis
+
 - by default these services don't talk to each other, so we will have to wire them out first. We have to do the following
   - VPC(virtual private cloud) is your own network to host your instances. For each available zone, there is a default VPC that's given to you. We will leverage VPC to connect our services.
   - Security Group (Firewall Rules) for your VPC. We will set up the security group to allow any other AWS services that has this same security group -> for Elastic Beanstalk, Elastic Cache, and RDS.
+    - for each service, find the Modify which you can change the VPC security group
+      For EB, go to Configuration -> instances -> modify
 - Set the environment variables for EB (refer to docker-compose file to see all the env variables). Go to Configuration -> Modify Software
   - for REDIS_HOST and POSTGRESHOST, go to EC and RDS and retrieve the primary endpoint. For other postgres variables (such as db name), refer to the memo. 
 - Go to IAM to create new API key and Secret key
 - Update the `.travis.yml` file to include the AWD deployment
-- .....
+- now push the change to github and if everything goes well it will be deployed into AWS with multi containers. Congrats!
 
 ## Kubernetes
 Finally, Kubernetes. Basically, in order to scale up our application, for example the previous fib example, we might only need to increase the "worker", as opposed to the entire container that has client, server, nginx (which EB offers). Kubernete will allow you to make this happen.
