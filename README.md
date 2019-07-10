@@ -319,6 +319,8 @@ kubectl apply -f client-node-port.yaml
 
 # to check if it's running, do
 kubectl get pods
+# to delete the object we created via the config file
+kubectl delete -f <config file>
 ```
 - to visit the ports inside the vm k8 cluster that minikube created, 
 ```
@@ -327,3 +329,21 @@ minikube ip # will get something like 192.168.99.100
 ```
   - then paste this into your broswer such that:
     - 192.168.99.100:31515
+- get detailed info about an object
+```
+kubectl describe <object type> <object name>
+# you can also do just the object type, such as
+kebectl describe pods
+```
+### Other Kubernetes objects
+One gotcha here, `Pod` does not allow you to change things other than image.So you want to change something like a port, it will be prohibited. In reality pod is rarely used in production. 
+#### Deployment
+Deployment is an object that maintains a set of identical pods, ensuring that they have the correct config amd that the right number exists. This is thereal object that we create in production environment.
+- refer to the configuration file
+- once you run "kubectl apply -f <config file for deloyment>" you should be able to access the localhost:31515 to see the website up
+- we can try to rebuild the image in docker hub and make sure kubernetes picks it up:
+  - to push new image to docker hub:
+  ```
+  docker build -t hhsu15/multi-client .  # build the image after you made chagnes to the source file
+  docker push hhsu15/multi-client  # push to docker hub
+  ```
