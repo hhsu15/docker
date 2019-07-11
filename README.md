@@ -347,3 +347,13 @@ Deployment is an object that maintains a set of identical pods, ensuring that th
   docker build -t hhsu15/multi-client .  # build the image after you made chagnes to the source file
   docker push hhsu15/multi-client  # push to docker hub
   ```
+  - Now, we will have to tag the image with a version number and we push to docker hub and then run a command to explicitly reach out to that version of image (imperative approach). So here we go:
+  ```
+  docker build -t hhsu15/multi-client:v5 .
+  docker push hhsu15/multi-client:v5 
+  
+  # here is the command to update that image inside of kubernetes
+  # kubectl set image <object type>/<object name> <container name>=<new image to use>
+  # for example:
+  kubectl set image deployment/client-deployment client=hhsu15/multi-client:v5
+  ```
