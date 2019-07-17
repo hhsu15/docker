@@ -37,9 +37,9 @@ docker ps --all
 docker create hello-world # will return an id
 docker start -a {id} # will start the container. -a means attach. It will output to the console. If you don't put -a, it will only print the id to the console but still runing in the background
 ```
-- to destroy all the containers
+- to destroy all the containers that are not active
 ```
-docker system prune
+docker system prune -a
 
 ```
 - to see logs emmitted from a container
@@ -306,10 +306,10 @@ kubectl cluster-info # make sure it's working
 - In the world of Kubernetes, there is no such thing as running one single container. The smallest thing you can create is is a "Pod" which has container(s). A Pod hosts a group of containers which serve similar purpose.
 #### Service
 - Sets up networking in a Kubernetes Cluster
-  - ClusterIP
-  - NodePort: Expose a container to the outside world (only for dev purpose)
+  - ClusterIP: expose a set of pods to other objects, such as Ingress,  in cluster (more restrict than NodePort, only objects in the cluster can, not the outside world!)
+  - NodePort: expose a set of pods to the outside world (only for dev purpose)
   - LoadBalancer
-  - Ingress
+  - Ingress: responsible to connect to the node from the outside world 
 
 #### Feed the config into Kubenetes cluster
 ```bash
@@ -335,7 +335,7 @@ kubectl describe <object type> <object name>
 # you can also do just the object type, such as
 kebectl describe pods
 ```
-### Other Kubernetes objects
+##/# Other Kubernetes objects
 One gotcha here, `Pod` does not allow you to change things other than image.So you want to change something like a port, it will be prohibited. In reality pod is rarely used in production. 
 #### Deployment
 Deployment is an object that maintains a set of identical pods, ensuring that they have the correct config amd that the right number exists. This is thereal object that we create in production environment.
@@ -357,3 +357,44 @@ Deployment is an object that maintains a set of identical pods, ensuring that th
   # for example:
   kubectl set image deployment/client-deployment client=hhsu15/multi-client:v5
   ```
+
+  #### Access docker containers inside of VM
+  - if you use minikube to start the kubernetes cluster, in order to see all the containers in the VM, 
+  ```
+  eval $(minikube docker-env)
+  docker ps  # now you should see the containers
+  ```
+  - though if you use docker-for-desktop, automatically you have access to the containers in the vm. Just run `docker ps` you will see the them
+#### In to the container to poke around
+Normally, you can do this to go into the container
+```
+docker exec -it <container id> sh
+# ls
+```
+Use kubectl, you can do the same thing:
+```
+kubectl get pods  # to get the pod id
+kubectl logs <pod id>  # to see logs
+kubectl exec -it <pod id> sh # to start the shell
+```
+
+## Kubernetes for multi containers 
+Baiscally like this:
+  Node -> Ingress Service -> Deployments(ClusterIP service) -> Pods -> containers
+  - For everyone of this we will have config files
+  - the shortcut to apply all the config files at the same time
+  ```
+  # apply the entire fold
+  kubectl apply -f k8s
+  ```
+ - refer to the complex project, basically for each of the component there is a `deployment` config file and `cluster-ip`(service) config file 
+### Use Volume with Database
+In the case the database (such as postgres) instance gets restarted, the data inside of that container/pod/files system will get lost. Therefore, we will use `volume` to have the data saved outside of the pod/deployment.
+#### PVC (Persistent volume claim)
+- Volume
+  -  the word "volume" in generic container term means a way to allow a container to access a filesystem outside itself. However, for Kubernetes, the word "Volume" is a type of object that allows a contanier to store data at the pod level - so if a container dies another container can still access it. But if the pod dies the volume is lost too - not so ideal.
+- Persistent Volume
+  - persistent volume lives outside of the deployment which sticks around even if pod dies
+- Persistent Volume Claim
+  - advertisment for possible database options. PVC is not an actual Kubernetes object but it's a way to tell kubernetes what you want and let kebernetes figure out how to do it. Under the hood, kubernetes is going to get a chunk of your harddrive and allocate the data to it
+  - however, when you are ready to deploy to the cloud provider, there is a ton of optios for kubernetes to choose the [storage classes](https://kubernetes.io/docs/concepts/storage/storage-classes/)
