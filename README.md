@@ -398,3 +398,16 @@ In the case the database (such as postgres) instance gets restarted, the data in
 - Persistent Volume Claim
   - advertisment for possible database options. PVC is not an actual Kubernetes object but it's a way to tell kubernetes what you want and let kebernetes figure out how to do it. Under the hood, kubernetes is going to get a chunk of your harddrive and allocate the data to it
   - however, when you are ready to deploy to the cloud provider, there is a ton of optios for kubernetes to choose the [storage classes](https://kubernetes.io/docs/concepts/storage/storage-classes/)
+#### Apply Persistent Volume Claim
+So in our example we put together the config file for PVC. You can run 
+```
+kubectl get pv  # to see running pv and you can see if it's created by pvc
+```
+## Set Env variables in Kubernetes
+Basically, set those env vairables in those deployment config files. However, for password or any secret keys, we will use another type of kubernetes object - "Secret". And we will apply it via imperative approach, as opposed to putting it in a config file...
+- Here is the command:
+```
+kubectl create secret generic <secret name> --from-literal key=value
+kubectl create secret generic pgpassword --from-literal PGPASSWORD=12345
+kubectl get secrets
+```
