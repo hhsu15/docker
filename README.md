@@ -411,3 +411,18 @@ kubectl create secret generic <secret name> --from-literal key=value
 kubectl create secret generic pgpassword --from-literal PGPASSWORD=12345
 kubectl get secrets
 ```
+## Ingress
+Ingress is a type of Service whose purpose is to expose a set of services to the outside world
+- Do not confuse with Nginx-Ingress and Kubernetes Ingress - they are different projects!!
+We are going to use Niginx-Ingress. Here is the [documentation](github.com/kubernetes/ingress-nginx)
+- config -> Ingress Crontroler -> to the ClusterIP services
+- we will visist the Nginx-Ingress project github website and go to the documentation to set up, essentially:
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/static/mandatory.yaml
+
+minikube addons enable ingress
+```
+- create the config file and apply the routing rules - this will be same as what we did last time, specifically,
+  - Look at the path of the request
+    - if request has a path of '/' -> client
+	- if request has a path of '/api' -> server
