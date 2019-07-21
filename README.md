@@ -426,3 +426,4 @@ minikube addons enable ingress
   - Look at the path of the request
     - if request has a path of '/' -> client
 	- if request has a path of '/api' -> server
+ - again, make sure you don't have typos...For the config files to be able to find the Cluster IP services, make sure you type the name correctly..It's so hard to debug!!!
