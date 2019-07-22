@@ -433,3 +433,31 @@ Of course there is a dashboard.
 ```
 minikube dashboard
 ```
+
+## Google Cloud production deployment
+Kubernetes was created by Google
+### Get started
+- Go to `console.cloud.google.com`
+- Create a new project
+- Enable billing - (I am using the free credit now!)
+- Under `Compute` session and select Kubernetes Engine
+- Click `create cluster`
+#### Set up travis yaml file
+- refer to complex example project
+- the travis file will read some credentials from a json file, and we will make that json file encrypted by using Travis CLI. In .travis.yaml, add code to unencrypt the json file and load it into GCloud SDK.
+  - first step is go to google cloud console -> IAM & admin -> service account -> create service account
+  - role -> Kubernetes Engine Admin
+  - create key -> JSON (you will download a json file that has all the credentais. do not expose this file to the outside world)
+  - Now, we need to install travis cli. In fact we only need this once, so we can try just using docker to install the image that has Ruby (cause you need Ruby to be able to install it) and instakl travis cli and run the command in the container. Once done. we can throw away that contanier. Sounds fun? Let's get to it!
+   ```
+   docker run -it -v $(pwd):/app ruby:2.3 sh  # run the image called ruby, excute bash command, use volume to swap the /app directory to local current directoty so we can access the json file in the container
+   gem install travis --no-rod --no-ri  # gem is package manager for ruby
+   gem install travis
+   travis login
+   # cooy json file into the volumed directory so we can use it in the container
+   travis encrypt-file service-account.json -r hhsu15/complex_example
+   ```
+   - after you do the travis-encrypt file it will give you a command which you need to copy and paste into the `.travis.yaml`
+   - also it will create a file, e.g., service-account.json.enc
+   - then, DELETE THE ORIGINAL JSON FILE!
+   - the encrpted file will then be ok to push to the github
