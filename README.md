@@ -461,3 +461,9 @@ Kubernetes was created by Google
    - also it will create a file, e.g., service-account.json.enc
    - then, DELETE THE ORIGINAL JSON FILE!
    - the encrpted file will then be ok to push to the github
+- Now we will make a separate bash script to build images, kubectl apply config yaml files, and imperative set the latest images.
+  - there is some workaround needed in order to set the latest images. Refer to the `deploy.sh` file
+  - by the way, each git commit hash tag is also called GIT SHA..You can get the head sha by running
+  ```
+  git rev-parse HEAD
+  ```
