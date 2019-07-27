@@ -414,7 +414,7 @@ kubectl get secrets
 ## Ingress
 Ingress is a type of Service whose purpose is to expose a set of services to the outside world
 - Do not confuse with Nginx-Ingress and Kubernetes Ingress - they are different projects!!
-We are going to use Niginx-Ingress. Here is the [documentation](github.com/kubernetes/ingress-nginx)
+We are going to use Nginx-Ingress. Here is the [documentation](github.com/kubernetes/ingress-nginx)
 - config -> Ingress Crontroler -> to the ClusterIP services
 - we will visist the Nginx-Ingress project github website and go to the documentation to set up, essentially:
 ```
@@ -467,3 +467,53 @@ Kubernetes was created by Google
   ```
   git rev-parse HEAD
   ```
+### Google Cloud Shell
+We will create the password, similar as what we did before to use kubectl commandand create that secret object.
+- on the GCloud console, on the top right hand, find the button that says goodle cloud shell.
+- we will have to run a set of commands to configure your project, same as what we put together in the travis yaml file. You only have to run this once for a cluster, unless you create another project with a different cluster than you will have to do this. Here are the commands:
+```
+gcloud config set project multi-k8s-247418 # this is the project id
+gcloud config set compute/zone us-central1-a
+gcloud container clusters get-credentials multi-cluster
+```
+Now you should be able to run the kubectl commands, like `kubectl get pods` in the gcloud console. cool!
+- so now we are able to run the imperative command to create the secret password:
+```
+kubectl create secret generic pgpassword --from-literal PGPASSWORD=password123
+```
+Now the last set up on GCloud, we have to go thru additional set up the [Ingress-Nginx](github.com/kubernetes/ingress-nginx)
+#### Helm
+Helm is a package manager for Kubernetes
+- this time we will use [Helm](https://kubernetes.github.io/ingress-nginx/deploy/#using-helm)
+- Let's go to github.com/helm/helm and go to [quick start](https://helm.sh/docs/using_helm/#from-script) and run the commands as described in the gcloud console to install helm
+- RBAC(Role Based Access Control)
+  - gcloud has this enabled by default
+  - we will need to make sure helm Tiller server has access to make all the changes to the kebernetes cluster. Run these commands
+  ```
+  kubectl create serviceaccount --namespace kube-system tiller
+  kubectl create clusterrolebinding tiller-cluster-rule --clusterrole=cluster-admin --serviceaccount=kube-system:tiller
+  # lastly, we will run helm init
+  helm init --service-account tiller --upgrade 
+  ```
+- Now, use helm to install ingress
+```
+helm install stable/nginx-ingress --name my-nginx --set rbac.create=true
+```
+```Note, I had some issue with RBAC the first time running above commands, if something goes wrong, remove everything and start over (from creating service account```
+- now, go to the "Workloads" tab and you should be seeing nginx-ingress stuff!
+- if you go to "Services" you should see Load balancer with two IP addresses. We will use them later on.
+- Under navigation menu, under Networking, go to Network services and you will find the load balancer that google cloud created for us. Essentially it's saying we can access the load balancer with the ip addresses. This Google Cloud Load Balancer is going to be the first gate that handles all the traffic before they get to the kubernetes.
+- something like this:
+   traffic -> gcloud load balancer -> "kubernetes world" Load Balancer Service on nginx-controller/nginx pod via Ingress Config -> my complex stuff
+- We should be all set! You can now got to the service and under Kubernetes Engine -> niginx-ingress-controler and find the IP address to see your website
+
+## Set up Https on Kubernetes Cluster
+You have to purchase a domain name!
+- set up connection with **LetsEncrypt** service
+- Go to domain.google.com to buy a domain
+- Once purchased, go to DNS, scroll down to the bottom and find Custom Resource Records
+- Put the IP address (without :port)
+- add another one using CNAME for the type and "www" for the name
+### Set up Cert Manager
+- go to github.com/jetstack/cert-manager and [Installing with Helm](https://docs.cert-manager.io/en/latest/getting-started/install/kubernetes.html#installing-with-helm)
+
