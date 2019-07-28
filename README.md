@@ -516,4 +516,15 @@ You have to purchase a domain name!
 - add another one using CNAME for the type and "www" for the name
 ### Set up Cert Manager
 - go to github.com/jetstack/cert-manager and [Installing with Helm](https://docs.cert-manager.io/en/latest/getting-started/install/kubernetes.html#installing-with-helm)
+- install cert manager via Helm
+- Create two obejcts via config files:
+  - Issuer: i.e., LetsEncrypt
+  - Certificate (it's going to be a Secret)
+- Once these files are done, check into the master and deploy to gcloud. So by deploying this, cert manager will try to reach out to Letsencrypt get the certificate and save it to the Certificate object.
+- wait for a few mins and we can then test if everything wgoes well:
+```
+kubectl get certificates
+kubectl describe cerficates
+kubectl get secrets 
+```
 
