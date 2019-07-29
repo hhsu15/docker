@@ -527,4 +527,5 @@ kubectl get certificates
 kubectl describe cerficates
 kubectl get secrets 
 ```
-
+- Last thing to do is to update the `ingress-service.yaml`file to apply certificate and redirect traffic to https.
+- That's it! You did it!! Kubernetes on Google Cloud! Congrats!
