@@ -394,6 +394,12 @@ In the case the database (such as postgres) instance gets restarted, the data in
 - Volume
   -  the word "volume" in generic container term means a way to allow a container to access a filesystem outside itself. However, for Kubernetes, the word "Volume" is a type of object that allows a contanier to store data at the pod level - so if a container dies another container can still access it. But if the pod dies the volume is lost too - not so ideal.
 - Persistent Volume
+
+## Skaffold
+A tool to help apply changes in dev and have them detected and reflected on Kubernetes Cluster. Refer to `skaffold.yaml` file
+```
+skaffold dev  # to run
+```
   - persistent volume lives outside of the deployment which sticks around even if pod dies
 - Persistent Volume Claim
   - advertisment for possible database options. PVC is not an actual Kubernetes object but it's a way to tell kubernetes what you want and let kebernetes figure out how to do it. Under the hood, kubernetes is going to get a chunk of your harddrive and allocate the data to it
